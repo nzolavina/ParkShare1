@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParkShare Davao | Parking, Shared Like Home</title>
+    <meta
+      name="description"
+      content="ParkShare helps Davao drivers find trusted parking spots and helps hosts earn from unused spaces."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ParkShare Home">
+        <span class="brand-mark">P</span>
+        <span class="brand-text">ParkShare</span>
+      </a>
+      <div class="auth-controls" aria-label="Authentication">
+        <div class="auth-buttons">
+          <a id="myBookingsLink" class="btn btn-outline" href="my-bookings.html" hidden>My bookings</a>
+          <a id="adminBookingsLink" class="btn btn-outline" href="#adminBookingsSection" hidden>Review bookings</a>
+          <a class="btn btn-outline" href="login.html">Login</a>
+          <a class="btn btn-solid" href="signup.html">Sign up</a>
+          <button id="logoutBtn" class="btn btn-outline" type="button" hidden>Logout</button>
+        </div>
+        <p id="authText" aria-live="polite"></p>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">AIRBNB FOR PARKING SPOTS</p>
+        <h1>Stop circling blocks. <span>Start parking smarter.</span></h1>
+        <p class="hero-copy">
+          ParkShare connects Davao drivers to trusted driveways, garages, and private lots in busy neighborhoods.
+          Reserve ahead, arrive stress-free.
+        </p>
+
+        <form id="searchForm" class="search-panel" aria-label="Search Parking Spots">
+          <div class="field">
+            <label for="location">Location</label>
+            <input id="location" name="location" type="text" placeholder="Poblacion, Matina, Lanang, Ecoland..." />
+          </div>
+          <div class="field">
+            <label for="spotType">Spot type</label>
+            <select id="spotType" name="spotType">
+              <option value="all">All</option>
+              <option value="driveway">Driveway</option>
+              <option value="garage">Garage</option>
+              <option value="lot">Private Lot</option>
+              <option value="condo">Condo Building</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="priceCap">Max price / hour (PHP)</label>
+            <select id="priceCap" name="priceCap">
+              <option value="999">No max</option>
+              <option value="30">PHP 30</option>
+              <option value="40">PHP 40</option>
+              <option value="50">PHP 50</option>
+              <option value="60">PHP 60</option>
+              <option value="80">PHP 80</option>
+            </select>
+          </div>
+          <button class="btn btn-solid" type="submit">Search</button>
+        </form>
+
+        <ul class="trust-strip" aria-label="Key Features">
+          <li>Verified hosts</li>
+          <li>Instant booking</li>
+          <li>Secure payments</li>
+          <li>Live availability</li>
+        </ul>
+      </section>
+
+      <section class="listings" id="listings">
+        <div class="section-head">
+          <p class="eyebrow">TRENDING SPACES</p>
+          <h2>Available spots near you</h2>
+          <p id="resultsText">Showing all featured spots.</p>
+          <button id="adminToggleBtn" class="btn btn-outline" type="button" hidden>Add new spot</button>
+          <form id="adminListingForm" class="admin-listing-form" hidden>
+            <input name="title" type="text" placeholder="Spot title" required />
+            <input name="location" type="text" placeholder="Location" required />
+            <select name="type" required>
+              <option value="">Spot type</option>
+              <option value="driveway">Driveway</option>
+              <option value="garage">Garage</option>
+              <option value="lot">Private Lot</option>
+              <option value="condo">Condo Building</option>
+            </select>
+            <input name="pricePerHour" type="number" min="1" step="1" placeholder="Price/hr" required />
+            <div id="imageUploader" class="image-uploader" role="button" tabindex="0" aria-label="Upload listing image">
+              <input id="imageFile" class="visually-hidden-input" name="imageFile" type="file" accept="image/*" required />
+              <p id="imageUploadHint" class="image-upload-hint">Drag and drop image here, or click to browse.</p>
+              <img id="imagePreview" class="image-preview" alt="Selected image preview" hidden />
+              <button id="clearImageBtn" class="btn btn-outline" type="button" hidden>Remove image</button>
+            </div>
+            <input name="features" type="text" placeholder="Features, comma-separated" />
+            <button class="btn btn-solid" type="submit">Publish listing</button>
+          </form>
+          <section id="adminBookingsSection" class="admin-bookings" hidden>
+            <div class="admin-bookings-head">
+              <h3>Booking approvals</h3>
+              <button id="refreshAdminBookingsBtn" class="btn btn-outline" type="button">Refresh</button>
+            </div>
+            <p class="admin-bookings-note">Approve bookings only after validating uploaded payment receipts.</p>
+            <div id="adminBookingsList" class="admin-bookings-list"></div>
+          </section>
+          <p id="actionText" aria-live="polite"></p>
+        </div>
+        <div id="listingGrid" class="listing-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="host" id="host">
+        <div class="host-copy">
+          <p class="eyebrow">HOST ON PARKSHARE</p>
+          <h2>Turn your empty parking space into monthly income.</h2>
+          <p>
+            List your driveway, garage, or lot in minutes. Set your own rates, choose your schedule,
+            and welcome vetted drivers.
+          </p>
+          <a class="btn btn-solid" href="#">Start hosting</a>
+        </div>
+        <div class="host-stats" aria-label="Host Benefits">
+          <article>
+            <h3>PHP 22,000</h3>
+            <p>Average monthly host earnings</p>
+          </article>
+          <article>
+            <h3>4.9 / 5</h3>
+            <p>Average host rating</p>
+          </article>
+          <article>
+            <h3>15 min</h3>
+            <p>Average time to publish a listing</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="how" id="how">
+        <p class="eyebrow">HOW IT WORKS</p>
+        <h2>Three simple steps</h2>
+        <div class="steps">
+          <article>
+            <span>1</span>
+            <h3>Search</h3>
+            <p>Choose your location, compare prices, and filter by spot type.</p>
+          </article>
+          <article>
+            <span>2</span>
+            <h3>Reserve</h3>
+            <p>Book instantly and receive exact entry details from your host.</p>
+          </article>
+          <article>
+            <span>3</span>
+            <h3>Park</h3>
+            <p>Arrive on time and park without the stress of city traffic loops.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>ParkShare | Parking, shared like home.</p>
+      <p>Runs with a local backend API.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

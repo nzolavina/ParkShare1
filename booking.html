@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParkShare Booking</title>
+    <meta name="description" content="Choose date and duration for your parking reservation." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+    <main class="booking-main">
+      <section class="booking-card" aria-labelledby="bookingTitle">
+        <a class="brand" href="index.html" aria-label="ParkShare Home">
+          <span class="brand-mark">P</span>
+          <span class="brand-text">ParkShare</span>
+        </a>
+
+        <p class="eyebrow">BOOK YOUR SPOT</p>
+        <h1 id="bookingTitle">Confirm your reservation</h1>
+        <p id="bookingListingText" class="hero-copy">Loading listing details...</p>
+
+        <form id="bookingForm" class="booking-form" novalidate>
+          <div class="field">
+            <label>Booking date</label>
+            <div class="calendar-widget" aria-label="Booking calendar">
+              <div class="calendar-head">
+                <button id="calendarPrev" class="btn btn-outline" type="button" aria-label="Previous month">Prev</button>
+                <p id="calendarMonthLabel"></p>
+                <button id="calendarNext" class="btn btn-outline" type="button" aria-label="Next month">Next</button>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+              </div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+            <input id="bookingDate" name="bookingDate" type="hidden" required />
+          </div>
+          <div id="timeField" class="field" hidden>
+            <label>Select booking hours</label>
+            <p class="time-help">Pick a start block, then pick an end block.</p>
+            <p class="time-help">Unavailable at 5:00 PM means the 5:00 PM-6:00 PM slot is already taken.</p>
+            <div id="timeBlockGrid" class="time-block-grid" aria-label="Time block selector"></div>
+            <input id="bookingTime" name="bookingTime" type="hidden" required />
+            <input id="bookingEndTime" name="bookingEndTime" type="hidden" required />
+            <input id="durationHours" name="durationHours" type="hidden" required />
+            <p id="selectedTimeText" class="selected-time-text">No time selected yet.</p>
+          </div>
+          <button class="btn btn-solid" type="submit">Confirm booking</button>
+        </form>
+
+        <div class="booking-actions">
+          <a class="btn btn-outline" href="index.html">Back to listings</a>
+        </div>
+
+        <p id="bookingText" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="booking.js"></script>
+  </body>
+</html>

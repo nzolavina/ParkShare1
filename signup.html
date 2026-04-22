@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParkShare Sign Up</title>
+    <meta name="description" content="Create your ParkShare account and start reserving parking spots." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+    <main class="auth-page-main" id="top">
+      <section class="auth-page-card" aria-labelledby="authPageTitle">
+        <a class="brand" href="index.html" aria-label="ParkShare Home">
+          <span class="brand-mark">P</span>
+          <span class="brand-text">ParkShare</span>
+        </a>
+
+        <p class="eyebrow">CREATE ACCOUNT</p>
+        <h1 id="authPageTitle">Sign up and start parking smarter</h1>
+        <p class="hero-copy">
+          Create your ParkShare account to reserve trusted spaces around Davao.
+        </p>
+
+        <form id="signupPageForm" class="auth-page-form" novalidate>
+          <div class="field">
+            <label for="signupName">Name</label>
+            <input id="signupName" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="signupEmail">Email</label>
+            <input id="signupEmail" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="signupPassword">Password</label>
+            <input
+              id="signupPassword"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              minlength="6"
+              required
+            />
+          </div>
+          <button class="btn btn-solid" type="submit">Create account</button>
+        </form>
+
+        <div class="auth-page-actions">
+          <a class="btn btn-outline" href="login.html">Already have an account? Log in</a>
+          <a class="btn btn-outline" href="index.html">Back to home</a>
+          <button id="logoutPageBtn" class="btn btn-outline" type="button">Log out</button>
+        </div>
+
+        <p id="signupPageText" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="signup.js"></script>
+  </body>
+</html>

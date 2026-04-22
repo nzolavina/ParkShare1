@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "Avida Towers C.M Recto Davao",
+    "location": "2-1P-28",
+    "type": "condo",
+    "pricePerHour": 25,
+    "rating": 5,
+    "reviews": 0,
+    "image": "images/uploads/1776523888924-afdb692f-eeb7-4c29-9ca9-bb8a0d5d1e81.jpg",
+    "features": [
+      "24/7 Security",
+      "Indoor"
+    ]
+  }
+]

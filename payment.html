@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParkShare Payment</title>
+    <meta name="description" content="Pay for your ParkShare reservation and upload your payment receipt." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+    <main class="booking-main">
+      <section class="booking-card" aria-labelledby="paymentTitle">
+        <a class="brand" href="index.html" aria-label="ParkShare Home">
+          <span class="brand-mark">P</span>
+          <span class="brand-text">ParkShare</span>
+        </a>
+
+        <p class="eyebrow">PAYMENT</p>
+        <h1 id="paymentTitle">Complete your payment</h1>
+        <p id="paymentBookingText" class="hero-copy">Loading booking details...</p>
+
+        <div class="payment-summary">
+          <p>Total amount</p>
+          <h2 id="paymentTotalAmount">PHP 0</h2>
+        </div>
+
+        <section class="payment-qr-card" aria-label="GCash QR payment">
+          <h3>Scan to pay with GCash</h3>
+          <img
+            id="paymentQrImage"
+            class="payment-qr-image"
+            src="images/gcash-qr.jpg"
+            alt="GCash payment QR code"
+          />
+          <p class="meta">If the QR image is missing, add your provided file as images/gcash-qr.jpg.</p>
+        </section>
+
+        <form id="receiptForm" class="booking-form" novalidate>
+          <div class="field">
+            <label for="receiptFile">Upload payment receipt</label>
+            <input id="receiptFile" name="receiptFile" type="file" accept="image/*,.pdf" required />
+          </div>
+          <button class="btn btn-solid" type="submit">Submit receipt</button>
+        </form>
+
+        <div class="booking-actions">
+          <a class="btn btn-outline" href="my-bookings.html">Go to My Bookings</a>
+          <a class="btn btn-outline" href="index.html">Back to home</a>
+        </div>
+
+        <p id="paymentText" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="payment.js"></script>
+  </body>
+</html>

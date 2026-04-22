@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Lorenzo Lavina",
+    "email": "larlavina@addu.edu.ph",
+    "passwordHash": "ebea4ef358628c07fe5dbd4f72271888:bf6ea101dae4a1a61db9ee1563b733baf5d10bd0b05db096d2212ac629c8735df76de41cafc52b6f578ea5c8d43b440af67c33d8aeb92b4278fc87c058cc436b",
+    "createdAt": "2026-04-18T14:25:34.432Z"
+  },
+  {
+    "id": 2,
+    "name": "Nzo Lavina",
+    "email": "nzolavs1738@gmail.com",
+    "passwordHash": "769ecaf629a9ca5a115aaa0d9567adda:305e286bc43bfbc4c8a3bdf6784f799726ce0a64cfc1041d43ebb79d4524a0ca55b848a1ed408a792bd80063f2b0b5b6b2dc111e31cf3c1ee670fe003076c71d",
+    "createdAt": "2026-04-18T14:26:55.522Z"
+  },
+  {
+    "id": 3,
+    "name": "ParkShare Admin",
+    "email": "admin@parkshare.local",
+    "role": "admin",
+    "passwordHash": "5e7604a64d50175a1b7e1c5ac431462c:ddbf2d93b8c67ad428f6114c5da82af60a06554545664c77bbd1ab04f6f778ec00cfbb516cc7d5f2d3b11d2ce665657b531e207b4a8f719d9a37621f4e98adb4",
+    "createdAt": "2026-04-18T14:31:34.674Z"
+  },
+  {
+    "id": 4,
+    "name": "Receipt Check",
+    "email": "receiptcheck1776529690@example.com",
+    "role": "user",
+    "passwordHash": "bec1359a3bf849f57ee1642b9f89c9ae:acad336f0ad84e8bddfce8f545e6d021a67687e5228ed983d7201ffdd618baea329f5532b48c5d7b57626047d13a5b37805ac59208ef5e0d86679ab7100bac19",
+    "createdAt": "2026-04-18T16:28:10.838Z"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "parkshare",
+  "version": "1.0.0",
+  "description": "ParkShare web app with Express backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "migrate:data": "node scripts/migrate-json-to-supabase.js"
+  },
+  "keywords": [
+    "parkshare",
+    "parking",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.0",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^2.1.1",
+    "pg": "^8.20.0"
+  }
+}
