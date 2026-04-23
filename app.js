@@ -17,6 +17,7 @@ const ADMIN_NAME = (process.env.ADMIN_NAME || "ParkShare Admin").toString();
 const LISTING_BUCKET = process.env.SUPABASE_LISTING_BUCKET || "listing-images";
 const RECEIPT_BUCKET = process.env.SUPABASE_RECEIPT_BUCKET || "receipts";
 const SESSION_STORE_MODE = (process.env.SESSION_STORE_MODE || "auto").toLowerCase();
+const SESSION_COOKIE_NAME = "parkshare_auth";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -141,6 +142,20 @@ if (shouldUseDatabaseSessionStore && process.env.DATABASE_URL) {
 }
 
 app.use(session(sessionOptions));
+
+app.use((req, _res, next) => {
+  if (req.session?.userId) {
+    return next();
+  }
+
+  const fallbackUserId = readAuthToken(req);
+  if (fallbackUserId && req.session) {
+    req.session.userId = fallbackUserId;
+  }
+
+  return next();
+});
+
 app.use(express.static(__dirname));
 
 let initPromise = null;
@@ -187,6 +202,114 @@ function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto.scryptSync(password, salt, 64).toString("hex");
   return `${salt}:${hash}`;
+}
+
+function toBase64Url(value) {
+  return Buffer.from(value, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function fromBase64Url(value) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+  return Buffer.from(padded, "base64").toString("utf8");
+}
+
+function parseCookieHeader(cookieHeader) {
+  const result = {};
+  if (!cookieHeader) {
+    return result;
+  }
+
+  cookieHeader.split(";").forEach((entry) => {
+    const [key, ...valueParts] = entry.trim().split("=");
+    if (!key) {
+      return;
+    }
+
+    result[key] = decodeURIComponent(valueParts.join("="));
+  });
+
+  return result;
+}
+
+function signValue(value) {
+  return crypto.createHmac("sha256", sessionOptions.secret).update(value).digest("hex");
+}
+
+function createAuthToken(userId) {
+  const payload = {
+    userId,
+    exp: Date.now() + sessionOptions.cookie.maxAge,
+  };
+  const encodedPayload = toBase64Url(JSON.stringify(payload));
+  const signature = signValue(encodedPayload);
+  return `${encodedPayload}.${signature}`;
+}
+
+function readAuthToken(req) {
+  const cookies = parseCookieHeader(req.headers.cookie || "");
+  const token = cookies[SESSION_COOKIE_NAME];
+  if (!token || !token.includes(".")) {
+    return null;
+  }
+
+  const [encodedPayload, signature] = token.split(".");
+  const expectedSignature = signValue(encodedPayload);
+  if (!signature || signature.length !== expectedSignature.length) {
+    return null;
+  }
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(fromBase64Url(encodedPayload));
+    if (!payload || Date.now() > Number(payload.exp)) {
+      return null;
+    }
+
+    const userId = Number(payload.userId);
+    return Number.isInteger(userId) ? userId : null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function setAuthCookie(res, userId) {
+  const token = createAuthToken(userId);
+  const secure = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  const cookie = [
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    `Max-Age=${Math.floor(sessionOptions.cookie.maxAge / 1000)}`,
+    secure ? "Secure" : null,
+  ]
+    .filter(Boolean)
+    .join("; ");
+
+  res.append("Set-Cookie", cookie);
+}
+
+function clearAuthCookie(res) {
+  const secure = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  const cookie = [
+    `${SESSION_COOKIE_NAME}=`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    "Max-Age=0",
+    secure ? "Secure" : null,
+  ]
+    .filter(Boolean)
+    .join("; ");
+
+  res.append("Set-Cookie", cookie);
 }
 
 function verifyPassword(password, storedHash) {
@@ -575,6 +698,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     const user = mapUserRow(createdRow);
     req.session.userId = user.id;
+    setAuthCookie(res, user.id);
     return res.status(201).json({
       message: `Welcome, ${user.name}!`,
       user: publicUser(user),
@@ -622,6 +746,7 @@ app.post("/api/auth/login", async (req, res) => {
     }
 
     req.session.userId = user.id;
+    setAuthCookie(res, user.id);
     return res.json({ message: "Logged in successfully.", user: publicUser(user) });
   } catch (error) {
     console.error("POST /api/auth/login failed:", error);
@@ -630,6 +755,12 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 app.post("/api/auth/logout", (req, res) => {
+  clearAuthCookie(res);
+
+  if (!req.session || typeof req.session.destroy !== "function") {
+    return res.json({ message: "Logged out." });
+  }
+
   req.session.destroy((error) => {
     if (error) {
       return res.status(500).json({ message: "Failed to logout." });
