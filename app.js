@@ -86,6 +86,15 @@ const sessionOptions = {
   },
 };
 
+const isServerlessRuntime =
+  process.env.VERCEL === "1" ||
+  Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+  Boolean(process.env.LAMBDA_TASK_ROOT);
+
+const shouldUseDatabaseSessionStore =
+  SESSION_STORE_MODE === "database" ||
+  (SESSION_STORE_MODE === "auto" && Boolean(process.env.DATABASE_URL) && !isServerlessRuntime);
+
 function buildPgPoolConfig(databaseUrl) {
   const config = {
     connectionString: databaseUrl,
@@ -109,7 +118,7 @@ function buildPgPoolConfig(databaseUrl) {
   return config;
 }
 
-if (SESSION_STORE_MODE !== "memory" && process.env.DATABASE_URL) {
+if (shouldUseDatabaseSessionStore && process.env.DATABASE_URL) {
   const PgStore = connectPgSimple(session);
   const pool = new pg.Pool(buildPgPoolConfig(process.env.DATABASE_URL));
   const pgStore = new PgStore({
@@ -121,8 +130,14 @@ if (SESSION_STORE_MODE !== "memory" && process.env.DATABASE_URL) {
     console.error("Session store connection error:", error.message);
   });
   sessionOptions.store = pgStore;
-} else if (SESSION_STORE_MODE === "memory") {
-  console.log("SESSION_STORE_MODE=memory, using in-memory sessions.");
+} else {
+  if (SESSION_STORE_MODE === "memory") {
+    console.log("SESSION_STORE_MODE=memory, using in-memory sessions.");
+  } else if (SESSION_STORE_MODE === "auto" && isServerlessRuntime) {
+    console.log("SESSION_STORE_MODE=auto on serverless runtime, using in-memory sessions.");
+  } else if (SESSION_STORE_MODE === "auto" && !process.env.DATABASE_URL) {
+    console.log("SESSION_STORE_MODE=auto without DATABASE_URL, using in-memory sessions.");
+  }
 }
 
 app.use(session(sessionOptions));
