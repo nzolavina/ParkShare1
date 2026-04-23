@@ -222,15 +222,15 @@ async function approveBooking(reservationId) {
 async function refreshAuthState() {
   try {
     const response = await apiFetch("/api/auth/me");
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error("Failed to check auth session.");
+      throw new Error(payload?.message || `Auth check failed (${response.status}).`);
     }
 
-    const payload = await response.json();
     updateAuthUI(payload.user);
   } catch (error) {
     updateAuthUI(null);
-    setAuthMessage("Auth service unavailable.", true);
+    setAuthMessage(error.message || "Auth service unavailable.", true);
   }
 }
 

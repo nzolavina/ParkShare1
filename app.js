@@ -135,6 +135,7 @@ app.use("/api", async (_req, res, next) => {
     await ensureInitialized();
     return next();
   } catch (error) {
+    console.error("API initialization failed:", error);
     return res.status(500).json({ message: "Server initialization failed." });
   }
 });
@@ -487,6 +488,7 @@ app.get("/api/auth/me", async (req, res) => {
 
     return res.json({ authenticated: true, user: publicUser(user) });
   } catch (error) {
+    console.error("GET /api/auth/me failed:", error);
     return res.status(500).json({ message: "Failed to load session." });
   }
 });
@@ -543,6 +545,7 @@ app.post("/api/auth/register", async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
+    console.error("POST /api/auth/register failed:", error);
     return res.status(500).json({ message: "Failed to register user." });
   }
 });
@@ -575,6 +578,7 @@ app.post("/api/auth/login", async (req, res) => {
     req.session.userId = user.id;
     return res.json({ message: "Logged in successfully.", user: publicUser(user) });
   } catch (error) {
+    console.error("POST /api/auth/login failed:", error);
     return res.status(500).json({ message: "Failed to login." });
   }
 });

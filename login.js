@@ -47,7 +47,7 @@ async function checkSession() {
 
     setMessage("Log in or create an account to start reserving.");
   } catch (error) {
-    setMessage("Could not reach auth service.", true);
+    setMessage(error.message || "Could not reach auth service.", true);
   }
 }
 
