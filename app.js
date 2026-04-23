@@ -209,11 +209,15 @@ function mapUserRow(row) {
     return null;
   }
 
+  const email = normalizeEmail(row.email);
+  const isConfiguredAdmin = email === ADMIN_EMAIL;
+  const role = isConfiguredAdmin ? "admin" : row.role || "user";
+
   return {
     id: Number(row.id),
     name: row.name,
-    email: row.email,
-    role: row.role || "user",
+    email,
+    role,
     passwordHash: row.password_hash,
     createdAt: row.created_at,
   };
@@ -604,6 +608,17 @@ app.post("/api/auth/login", async (req, res) => {
     const user = mapUserRow(row);
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    if (normalizeEmail(user.email) === ADMIN_EMAIL && row.role !== "admin") {
+      const { error: promoteError } = await client
+        .from("users")
+        .update({ role: "admin" })
+        .eq("id", user.id);
+
+      if (promoteError) {
+        throw promoteError;
+      }
     }
 
     req.session.userId = user.id;
