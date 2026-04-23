@@ -25,6 +25,22 @@ let selectedStartHour = null;
 let selectedEndHour = null;
 let occupiedHours = new Set();
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 function formatHourForApi(hour) {
   return `${String(hour).padStart(2, "0")}:00`;
 }
@@ -83,7 +99,7 @@ async function loadAvailabilityForDate(dateIso) {
   }
 
   try {
-    const response = await fetch(`/api/listings/${listingId}/availability?date=${encodeURIComponent(dateIso)}`);
+    const response = await apiFetch(`/api/listings/${listingId}/availability?date=${encodeURIComponent(dateIso)}`);
     if (!response.ok) {
       throw new Error("Could not load availability.");
     }
@@ -207,7 +223,7 @@ function renderCalendar() {
 }
 
 async function checkAuth() {
-  const response = await fetch("/api/auth/me");
+  const response = await apiFetch("/api/auth/me");
   if (!response.ok) {
     throw new Error("Could not verify session.");
   }
@@ -232,7 +248,7 @@ async function loadListing() {
   }
 
   try {
-    const response = await fetch(`/api/listings/${listingId}`);
+    const response = await apiFetch(`/api/listings/${listingId}`);
     if (!response.ok) {
       throw new Error("Listing not found.");
     }
@@ -277,7 +293,7 @@ async function submitBooking() {
 
   try {
     setMessage("Creating reservation...");
-    const response = await fetch("/api/reservations", {
+    const response = await apiFetch("/api/reservations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

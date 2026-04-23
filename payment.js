@@ -7,6 +7,22 @@ const params = new URLSearchParams(window.location.search);
 const reservationId = Number(params.get("reservationId"));
 let reservation = null;
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 async function parseResponseJson(response) {
   try {
     return await response.json();
@@ -33,7 +49,7 @@ function formatTimeForDisplay(timeValue) {
 }
 
 async function checkAuth() {
-  const response = await fetch("/api/auth/me");
+  const response = await apiFetch("/api/auth/me");
   if (!response.ok) {
     throw new Error("Could not verify session.");
   }
@@ -52,7 +68,7 @@ async function checkAuth() {
 
 async function loadReservation() {
   try {
-    const response = await fetch("/api/reservations");
+    const response = await apiFetch("/api/reservations");
     const payload = await response.json();
     if (!response.ok) {
       throw new Error(payload.message || "Failed to load reservations.");
@@ -100,7 +116,7 @@ async function submitReceipt() {
 
   const formData = new FormData(receiptForm);
   try {
-    const latestReservationsResponse = await fetch("/api/reservations");
+    const latestReservationsResponse = await apiFetch("/api/reservations");
     const latestReservationsPayload = await parseResponseJson(latestReservationsResponse);
     if (!latestReservationsResponse.ok) {
       throw new Error(latestReservationsPayload.message || "Could not refresh bookings.");
@@ -125,7 +141,7 @@ async function submitReceipt() {
     }
 
     setMessage("Uploading receipt...");
-    const response = await fetch(`/api/reservations/${reservation.id}/receipt`, {
+    const response = await apiFetch(`/api/reservations/${reservation.id}/receipt`, {
       method: "POST",
       body: formData,
     });

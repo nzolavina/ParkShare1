@@ -2,6 +2,22 @@ const pendingBookingsList = document.getElementById("pendingBookingsList");
 const confirmedBookingsList = document.getElementById("confirmedBookingsList");
 const myBookingsText = document.getElementById("myBookingsText");
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 function setMessage(message, isError = false) {
   myBookingsText.textContent = message;
   myBookingsText.style.color = isError ? "#9f1239" : "var(--muted)";
@@ -50,7 +66,7 @@ function bookingCardMarkup(booking) {
 }
 
 async function checkAuth() {
-  const response = await fetch("/api/auth/me");
+  const response = await apiFetch("/api/auth/me");
   if (!response.ok) {
     throw new Error(`Could not verify session (${response.status}).`);
   }
@@ -70,7 +86,7 @@ async function checkAuth() {
 async function loadBookings() {
   try {
     setMessage("Loading bookings...");
-    const response = await fetch("/api/reservations");
+    const response = await apiFetch("/api/reservations");
     const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
       throw new Error(payload?.message || `Failed to load your bookings (${response.status}).`);

@@ -20,6 +20,22 @@ let currentListings = [];
 let currentUser = null;
 let imagePreviewUrl = null;
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 function listingCardMarkup(listing) {
   const featureMarkup = listing.features.map((feature) => `<span>${feature}</span>`).join("");
   const isAdmin = currentUser?.role === "admin";
@@ -163,7 +179,7 @@ async function loadAdminBookings() {
   }
 
   try {
-    const response = await fetch("/api/admin/reservations");
+    const response = await apiFetch("/api/admin/reservations");
     const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
       throw new Error(payload?.message || `Failed to load admin bookings (${response.status}).`);
@@ -188,7 +204,7 @@ async function approveBooking(reservationId) {
 
   try {
     setActionMessage("Approving booking...");
-    const response = await fetch(`/api/admin/reservations/${reservationId}/approve`, {
+    const response = await apiFetch(`/api/admin/reservations/${reservationId}/approve`, {
       method: "POST",
     });
     const payload = await parseResponseJsonSafe(response);
@@ -205,7 +221,7 @@ async function approveBooking(reservationId) {
 
 async function refreshAuthState() {
   try {
-    const response = await fetch("/api/auth/me");
+    const response = await apiFetch("/api/auth/me");
     if (!response.ok) {
       throw new Error("Failed to check auth session.");
     }
@@ -220,7 +236,7 @@ async function refreshAuthState() {
 
 async function logout() {
   try {
-    const response = await fetch("/api/auth/logout", { method: "POST" });
+    const response = await apiFetch("/api/auth/logout", { method: "POST" });
     const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
       throw new Error(payload?.message || `Logout failed (${response.status}).`);
@@ -248,7 +264,7 @@ async function loadListings() {
 
   try {
     setActionMessage("Loading listings...");
-    const response = await fetch(`/api/listings?${params.toString()}`);
+    const response = await apiFetch(`/api/listings?${params.toString()}`);
     if (!response.ok) {
       throw new Error("Failed to fetch listings.");
     }
@@ -284,7 +300,7 @@ async function addListing() {
 
   try {
     setActionMessage("Publishing listing...");
-    const response = await fetch("/api/listings", {
+    const response = await apiFetch("/api/listings", {
       method: "POST",
       body: formData,
     });
@@ -317,7 +333,7 @@ async function removeListing(listingId) {
 
   try {
     setActionMessage("Removing listing...");
-    const response = await fetch(`/api/listings/${listingId}`, {
+    const response = await apiFetch(`/api/listings/${listingId}`, {
       method: "DELETE",
     });
     const body = await parseResponseJsonSafe(response);

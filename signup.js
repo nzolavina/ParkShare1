@@ -2,6 +2,22 @@ const signupForm = document.getElementById("signupPageForm");
 const signupText = document.getElementById("signupPageText");
 const logoutBtn = document.getElementById("logoutPageBtn");
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 function setMessage(message, isError = false) {
   signupText.textContent = message;
   signupText.style.color = isError ? "#9f1239" : "var(--muted)";
@@ -17,7 +33,7 @@ async function parseResponseJsonSafe(response) {
 
 async function checkSession() {
   try {
-    const response = await fetch("/api/auth/me");
+    const response = await apiFetch("/api/auth/me");
     const payload = await parseResponseJsonSafe(response);
 
     if (!response.ok) {
@@ -39,7 +55,7 @@ async function signup(name, email, password) {
   setMessage("Creating account...");
 
   try {
-    const response = await fetch("/api/auth/register", {
+    const response = await apiFetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
@@ -61,7 +77,7 @@ async function logout() {
   setMessage("Logging out...");
 
   try {
-    const response = await fetch("/api/auth/logout", { method: "POST" });
+    const response = await apiFetch("/api/auth/logout", { method: "POST" });
     const payload = await parseResponseJsonSafe(response);
 
     if (!response.ok) {

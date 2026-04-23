@@ -2,6 +2,22 @@ const loginForm = document.getElementById("loginPageForm");
 const loginText = document.getElementById("loginPageText");
 const logoutBtn = document.getElementById("logoutPageBtn");
 
+const API_BASE =
+  window.location.hostname === "localhost" && window.location.port && window.location.port !== "3000"
+    ? "http://localhost:3000"
+    : "";
+
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    credentials: "include",
+    ...options,
+  });
+}
+
 function setMessage(message, isError = false) {
   loginText.textContent = message;
   loginText.style.color = isError ? "#9f1239" : "var(--muted)";
@@ -17,7 +33,7 @@ async function parseResponseJsonSafe(response) {
 
 async function checkSession() {
   try {
-    const response = await fetch("/api/auth/me");
+    const response = await apiFetch("/api/auth/me");
     const payload = await parseResponseJsonSafe(response);
 
     if (!response.ok) {
@@ -39,7 +55,7 @@ async function login(email, password) {
   setMessage("Logging in...");
 
   try {
-    const response = await fetch("/api/auth/login", {
+    const response = await apiFetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -61,7 +77,7 @@ async function logout() {
   setMessage("Logging out...");
 
   try {
-    const response = await fetch("/api/auth/logout", { method: "POST" });
+    const response = await apiFetch("/api/auth/logout", { method: "POST" });
     const payload = await parseResponseJsonSafe(response);
 
     if (!response.ok) {
