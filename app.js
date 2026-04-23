@@ -413,7 +413,7 @@ async function uploadToStorage(bucketName, file, prefix) {
 async function ensureAdminAccount(client) {
   const { data: existingRow, error: lookupError } = await client
     .from("users")
-    .select("id,email,role")
+    .select("id,email,role,name,password_hash")
     .eq("email", ADMIN_EMAIL)
     .maybeSingle();
 
@@ -422,15 +422,31 @@ async function ensureAdminAccount(client) {
   }
 
   if (existingRow) {
+    const updates = {};
+
     if (existingRow.role !== "admin") {
+      updates.role = "admin";
+    }
+
+    if (existingRow.name !== ADMIN_NAME) {
+      updates.name = ADMIN_NAME;
+    }
+
+    if (!verifyPassword(ADMIN_PASSWORD, existingRow.password_hash || "")) {
+      updates.password_hash = hashPassword(ADMIN_PASSWORD);
+    }
+
+    if (Object.keys(updates).length > 0) {
       const { error: updateError } = await client
         .from("users")
-        .update({ role: "admin" })
+        .update(updates)
         .eq("id", existingRow.id);
+
       if (updateError) {
         throw updateError;
       }
     }
+
     return;
   }
 
