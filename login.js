@@ -7,12 +7,24 @@ function setMessage(message, isError = false) {
   loginText.style.color = isError ? "#9f1239" : "var(--muted)";
 }
 
+async function parseResponseJsonSafe(response) {
+  try {
+    return await response.json();
+  } catch (_error) {
+    return null;
+  }
+}
+
 async function checkSession() {
   try {
     const response = await fetch("/api/auth/me");
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
 
-    if (response.ok && payload.authenticated) {
+    if (!response.ok) {
+      throw new Error(`Auth check failed (${response.status}).`);
+    }
+
+    if (payload && payload.authenticated) {
       setMessage(`Signed in as ${payload.user.name}. You can continue to booking.`);
       return;
     }
@@ -33,9 +45,9 @@ async function login(email, password) {
       body: JSON.stringify({ email, password }),
     });
 
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(payload.message || "Login failed.");
+      throw new Error(payload?.message || `Login failed (${response.status}).`);
     }
 
     setMessage("Login successful. Redirecting...");
@@ -50,10 +62,10 @@ async function logout() {
 
   try {
     const response = await fetch("/api/auth/logout", { method: "POST" });
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
 
     if (!response.ok) {
-      throw new Error(payload.message || "Logout failed.");
+      throw new Error(payload?.message || `Logout failed (${response.status}).`);
     }
 
     setMessage("Logged out.");

@@ -7,6 +7,14 @@ function setMessage(message, isError = false) {
   myBookingsText.style.color = isError ? "#9f1239" : "var(--muted)";
 }
 
+async function parseResponseJsonSafe(response) {
+  try {
+    return await response.json();
+  } catch (_error) {
+    return null;
+  }
+}
+
 function formatTimeForDisplay(timeValue) {
   if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(timeValue || "")) {
     return timeValue || "";
@@ -44,10 +52,10 @@ function bookingCardMarkup(booking) {
 async function checkAuth() {
   const response = await fetch("/api/auth/me");
   if (!response.ok) {
-    throw new Error("Could not verify session.");
+    throw new Error(`Could not verify session (${response.status}).`);
   }
 
-  const payload = await response.json();
+  const payload = await parseResponseJsonSafe(response);
   if (!payload.authenticated) {
     setMessage("Please login to view your bookings.", true);
     setTimeout(() => {
@@ -63,9 +71,9 @@ async function loadBookings() {
   try {
     setMessage("Loading bookings...");
     const response = await fetch("/api/reservations");
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(payload.message || "Failed to load your bookings.");
+      throw new Error(payload?.message || `Failed to load your bookings (${response.status}).`);
     }
 
     const reservations = payload.reservations || [];

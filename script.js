@@ -78,6 +78,14 @@ function setAuthMessage(message, isError = false) {
   authText.style.color = isError ? "#9f1239" : "var(--muted)";
 }
 
+async function parseResponseJsonSafe(response) {
+  try {
+    return await response.json();
+  } catch (_error) {
+    return null;
+  }
+}
+
 function updateAuthUI(user) {
   currentUser = user;
   const isAuthenticated = Boolean(user);
@@ -156,9 +164,9 @@ async function loadAdminBookings() {
 
   try {
     const response = await fetch("/api/admin/reservations");
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(payload.message || "Failed to load admin bookings.");
+      throw new Error(payload?.message || `Failed to load admin bookings (${response.status}).`);
     }
 
     if (!payload.reservations.length) {
@@ -183,9 +191,9 @@ async function approveBooking(reservationId) {
     const response = await fetch(`/api/admin/reservations/${reservationId}/approve`, {
       method: "POST",
     });
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(payload.message || "Failed to approve booking.");
+      throw new Error(payload?.message || `Failed to approve booking (${response.status}).`);
     }
 
     setActionMessage(payload.message || "Booking approved.");
@@ -213,9 +221,9 @@ async function refreshAuthState() {
 async function logout() {
   try {
     const response = await fetch("/api/auth/logout", { method: "POST" });
-    const payload = await response.json();
+    const payload = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(payload.message || "Logout failed.");
+      throw new Error(payload?.message || `Logout failed (${response.status}).`);
     }
 
     updateAuthUI(null);
@@ -281,9 +289,9 @@ async function addListing() {
       body: formData,
     });
 
-    const body = await response.json();
+    const body = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(body.message || "Failed to create listing.");
+      throw new Error(body?.message || `Failed to create listing (${response.status}).`);
     }
 
     adminListingForm.reset();
@@ -312,9 +320,9 @@ async function removeListing(listingId) {
     const response = await fetch(`/api/listings/${listingId}`, {
       method: "DELETE",
     });
-    const body = await response.json();
+    const body = await parseResponseJsonSafe(response);
     if (!response.ok) {
-      throw new Error(body.message || "Failed to remove listing.");
+      throw new Error(body?.message || `Failed to remove listing (${response.status}).`);
     }
 
     await loadListings();
